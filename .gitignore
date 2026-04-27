@@ -17,3 +17,5 @@ Reporting.drawio (1).png
 
 # Logs
 *.log
+
+.frontend_git_backup/

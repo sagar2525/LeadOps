@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f1e7;
+  --foreground: #2a221a;
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-border: rgba(68, 52, 37, 0.1);
+  --accent: #c39a52;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-color: rgba(114, 92, 65, 0.6) rgba(39, 31, 23, 0.12);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(114, 92, 65, 0.6);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(39, 31, 23, 0.12);
+}
+
+.dashboard-shell {
+  min-height: 100%;
+  padding: 2rem 2rem 3rem;
+}
+
+.glass-panel {
+  border: 1px solid rgba(82, 64, 46, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(249, 245, 237, 0.94) 100%);
+  box-shadow: 0 24px 65px rgba(80, 62, 40, 0.08);
+}
+
+.metric-card {
+  border-radius: 1.45rem;
+  border: 1px solid rgba(82, 64, 46, 0.11);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2ea 100%);
+  box-shadow: 0 18px 34px rgba(85, 67, 47, 0.08);
+}
+
+.section-card {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(82, 64, 46, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 243, 235, 0.96) 100%);
+  box-shadow: 0 22px 50px rgba(85, 67, 47, 0.08);
+}
+
+.soft-toolbar {
+  border: 1px solid rgba(82, 64, 46, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 32px rgba(85, 67, 47, 0.08);
+}
+
+.cream-inset {
+  background: linear-gradient(180deg, #fbf8f1 0%, #f4ede1 100%);
+}
