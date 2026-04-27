@@ -1,0 +1,246 @@
+openapi: 3.0.0
+info:
+  title: LeadOps Analytics Engine API
+  version: 2.0.0
+  description: API for ingesting GHL leads into the MongoDB reporting schema and updating lead-level reporting metrics.
+servers:
+  - url: /api/v1
+paths:
+  /make/reporting-events:
+    post:
+      summary: Handle Make.com reporting events emitted after Google Sheets steps
+      description: >
+        Normalized ingestion endpoint for the scenarios in docs/make-blueprints.
+        It accepts a scenario_name plus an event_type, stores the raw event for auditability,
+        and applies lead/metric updates for lead-level reporting events.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - scenario_name
+                - event_type
+              properties:
+                scenario_name:
+                  type: string
+                  example: New Leads - Reporting
+                event_type:
+                  type: string
+                  enum:
+                    - new_lead
+                    - lead_source_update
+                    - speed_to_lead
+                    - all_dial
+                    - appointment_booked
+                    - appointment_cancelled
+                    - appointment_rescheduled
+                    - showed
+                    - no_show
+                    - disqualified
+                    - aged_lead
+                    - dnd
+                    - in_conversation
+                    - off_shift_appointment_request
+                    - virtual_quote
+                    - recording_summary
+                    - daily_summary_agent_stats
+                    - daily_summary_project_stats
+                    - daily_summary_project_source
+                    - reporting_alert
+                sheet_name:
+                  type: string
+                  example: New Leads
+                google_sheet_action:
+                  type: string
+                  enum: [addRow, updateRow, filterRows]
+                lead_id:
+                  type: string
+                  description: Optional MongoDB ObjectId if the scenario already knows the lead.
+                ghl_sub_account_id:
+                  type: string
+                company_name:
+                  type: string
+                phone_number:
+                  type: string
+                full_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                service_requested:
+                  type: string
+                location:
+                  type: string
+                assigned_setter:
+                  type: string
+                lead_source:
+                  type: string
+                status:
+                  type: string
+                  enum: [New, In Progress, Booked, Aged, DQ]
+                dq_reason:
+                  type: string
+                  nullable: true
+                showed_up:
+                  type: string
+                  enum: [Pending, Yes, No]
+                appointment_date:
+                  type: string
+                  format: date-time
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time
+                occurred_at:
+                  type: string
+                  format: date-time
+                first_contact_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                speed_to_lead_min:
+                  type: number
+                  nullable: true
+                activity_type:
+                  type: string
+                  enum: [call, sms, email]
+                activity_count:
+                  type: integer
+                  minimum: 1
+                call_count_delta:
+                  type: integer
+                  minimum: 0
+                sms_count_delta:
+                  type: integer
+                  minimum: 0
+                email_count_delta:
+                  type: integer
+                  minimum: 0
+                recording_url:
+                  type: string
+                  format: uri
+                  nullable: true
+                call_summary:
+                  type: string
+                  nullable: true
+                row_number:
+                  type: integer
+                  minimum: 0
+                raw:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Event processed into the reporting schema
+        '202':
+          description: Event logged successfully but did not update lead-level reporting fields
+        '400':
+          description: Validation or processing error
+
+  /leads/ingest:
+    post:
+      summary: Ingest or upsert a lead for a GHL sub-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ghl_sub_account_id
+                - company_name
+                - phone_number
+              properties:
+                ghl_sub_account_id:
+                  type: string
+                company_name:
+                  type: string
+                phone_number:
+                  type: string
+                full_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                service_requested:
+                  type: string
+                location:
+                  type: string
+                assigned_setter:
+                  type: string
+                status:
+                  type: string
+                  enum: [New, In Progress, Booked, Aged, DQ]
+                dq_reason:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Lead updated successfully
+        '201':
+          description: Lead created successfully
+        '400':
+          description: Validation error
+
+  /leads/activity:
+    post:
+      summary: Increment lead activity counters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lead_id
+                - type
+              properties:
+                lead_id:
+                  type: string
+                  description: MongoDB ObjectId for the lead document.
+                type:
+                  type: string
+                  enum: [call, sms, email]
+      responses:
+        '200':
+          description: Lead metrics updated successfully
+        '404':
+          description: Lead not found
+
+  /leads/status:
+    post:
+      summary: Update lead status and attendance fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lead_id
+              properties:
+                lead_id:
+                  type: string
+                  description: MongoDB ObjectId for the lead document.
+                status:
+                  type: string
+                  enum: [New, In Progress, Booked, Aged, DQ]
+                dq_reason:
+                  type: string
+                  nullable: true
+                showed_up:
+                  type: string
+                  enum: [Pending, Yes, No]
+                appointment_date:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          description: Lead status updated successfully
+        '404':
+          description: Lead not found

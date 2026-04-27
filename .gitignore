@@ -1,0 +1,19 @@
+# Dependency folders
+**/node_modules/
+
+# Build outputs
+**/.next/
+**/dist/
+**/build/
+
+# Environment files
+**/.env
+**/.env.*
+
+# User-requested exclusions
+docs/
+reporting.drawio
+Reporting.drawio (1).png
+
+# Logs
+*.log
